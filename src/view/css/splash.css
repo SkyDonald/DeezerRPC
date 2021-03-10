@@ -1,0 +1,19 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-align: center;
+    color: black;
+    font-size: 72pt;
+    font-family: arial;
+    text-decoration: none;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
