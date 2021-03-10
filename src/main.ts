@@ -211,7 +211,7 @@ ipcMain.on('song-changed', (event: any, song: Song) => {
             state: song.artist,
             assets: {
                 large_image: 'default',
-                large_text: 'Deezer',
+                large_text: 'DeezerRPC',
                 small_image: 'listening',
                 small_text: 'Listening'
             },
@@ -232,7 +232,7 @@ ipcMain.on('song-changed', (event: any, song: Song) => {
             state: song.artist,
             assets: {
                 large_image: 'default',
-                large_text: 'Deezer',
+                large_text: 'DeezerRPC',
                 small_image: 'paused',
                 small_text: 'Paused'
             },
@@ -256,7 +256,7 @@ ipcMain.on('song-changed', (event: any, song: Song) => {
 app.on('ready', createMainWindow);
 
 // Initialize RPC
-RPC.login({ clientId: Settings.DiscordClientID }).catch((err) => {
+RPC.login({ clientId: Settings.DiscordClientID }).catch((err: any) => {
     dialog.showErrorBox('Rich Presence Login Failed', `Please, verify if your discord app is opened/working and relaunch this application. (${err})`);
 });
 

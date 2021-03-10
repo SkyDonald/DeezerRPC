@@ -57,7 +57,7 @@
   "homepage": "https://github.com/SkyDonald/DeezerRPC",
   "devDependencies": {
     "@types/configstore": "^4.0.0",
-    "@types/discord-rpc": "^3.0.4",
+    "@types/discord-rpc": "^3.0.5",
     "electron": "^10.1.5",
     "electron-builder": "^22.9.1",
     "shelljs": "^0.8.4",
@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "configstore": "^5.0.1",
-    "discord-rpc": "^3.1.4",
+    "discord-rpc": "^3.2.0",
     "electron-settings": "^4.0.2",
     "moment": "^2.29.1"
   }
