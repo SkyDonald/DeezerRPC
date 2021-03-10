@@ -13,6 +13,7 @@ You can contact us for support on our [chat server](https://discord.gg/AUfTUJA)
 # Give me your opinion
 
 [![](https://gitrate.herokuapp.com/happy?ref=SkyDonald.DeezerRPC)](https://gitrate.herokuapp.com/happy/done?ref=SkyDonald.DeezerRPC)
+
 [![](https://gitrate.herokuapp.com/unhappy?ref=SkyDonald.DeezerRPC)](https://gitrate.herokuapp.com/unhappy/done?ref=SkyDonald.DeezerRPC)
 
 ## Exemple
