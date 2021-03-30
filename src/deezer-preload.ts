@@ -1,4 +1,4 @@
-import moment from 'moment'
+import dayjs from 'dayjs';
 import Song from './model/Song';
 import { ipcRenderer } from 'electron';
 
@@ -48,14 +48,14 @@ function initializeListeners() {
 function timestamp(): number {
     const sMax = document.querySelector("div.slider-counter.slider-counter-max")!.textContent
     const sCurrent = document.querySelector("div.slider-counter.slider-counter-current")!.textContent
+    if (!sMax || !sCurrent) return 0;
 
-    return moment(Date.now())
-        .add(sMax?.substring(0, 2), "m")
-        .add(sMax?.substring(3), "s")
-        .subtract(sCurrent?.substring(0, 2), "m")
-        .subtract(sCurrent?.substring(3), "s")
+    return dayjs(Date.now())
+        .add(parseInt(sMax.substring(0, 2)), "m")
+        .add(parseInt(sMax.substring(3)), "s")
+        .subtract(parseInt(sCurrent.substring(0, 2)), "m")
+        .subtract(parseInt(sCurrent.substring(3)), "s")
         .unix();
 }
 
-// IPC
 setTimeout(initializeListeners, 3000);

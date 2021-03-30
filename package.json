@@ -1,12 +1,12 @@
 {
   "name": "deezerrpc",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Deezer integrated with the Discord Rich Presence.",
   "main": "build/main.js",
   "scripts": {
     "tsc": "tsc",
-    "package-assets": "node package-assets.js",
-    "build": "npm run tsc && npm run package-assets",
+    "deezer-assets": "node deezer-assets.js",
+    "build": "npm run tsc && npm run deezer-assets",
     "start": "npm run build && electron ./build/main.js",
     "pack": "npm run build && electron-builder --dir",
     "dist": "npm run build && electron-builder",
@@ -50,7 +50,7 @@
     "desktop"
   ],
   "author": "SkyDonald",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/SkyDonald/DeezerRPC/issues"
   },
@@ -65,8 +65,8 @@
   },
   "dependencies": {
     "configstore": "^5.0.1",
+    "dayjs": "^1.10.4",
     "discord-rpc": "^3.2.0",
-    "electron-settings": "^4.0.2",
-    "moment": "^2.29.1"
+    "electron-settings": "^4.0.2"
   }
 }

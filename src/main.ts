@@ -7,22 +7,19 @@ import Configstore from 'configstore';
 import settings from 'electron-settings';
 import { app, BrowserWindow, Tray, Menu, ipcMain, dialog, globalShortcut, nativeImage, shell } from 'electron';
 
-const RPC = new Client({ transport: 'ipc' });
-const APP_PACKAGE = require('./../package.json');
-const APP_PREFERENCES = new Configstore(APP_PACKAGE.name, { 'closeToTray': false, 'minimizeToTray': false });
+const client = new Client({ transport: 'ipc' });
+const pkg = require('./../package.json');
+const preferences = new Configstore(pkg.name, { 'closeToTray': false, 'minimizeToTray': false });
 
 var tray: Tray;
 
-// Entry
 function createMainWindow() {
     let userAgent: string;
     let splashWindow: BrowserWindow;
     const mainWindow = createWindow(false, 'deezer-preload.js');
 
-    // Disable menu (only works on Windows)
     mainWindow.setMenu(null);
 
-    // User agent
     switch (process.platform) {
         case 'linux':
             userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.114 Safari/537.36'
@@ -32,22 +29,19 @@ function createMainWindow() {
             userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.114 Safari/537.36'
             break;
 
-        // win32
         default:
             userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36'
             break;
     }
 
-    mainWindow.loadURL(Settings.DeezerUrl, { userAgent: userAgent });
+    mainWindow.loadURL(Settings.url, { userAgent: userAgent });
 
-    // MainWindow
     mainWindow.webContents.once('did-finish-load', () => {
         mainWindow.show();
         splashWindow.close();
         registerShortcutsAndTray(mainWindow);
     });
 
-    // Events
     mainWindow.on('close', (event: any) => {
         event.preventDefault();
 
@@ -58,7 +52,6 @@ function createMainWindow() {
         if (getPreference<boolean>('minimizeToTray')) mainWindow.hide();
     });
 
-    // Splash
     splashWindow = createWindow(true);
     splashWindow.setResizable(false);
     splashWindow.setMaximizable(false);
@@ -70,8 +63,8 @@ function createMainWindow() {
 function createWindow(visibility: boolean, preload?: string) {
     if (preload) {
         return new BrowserWindow({
-            width: Settings.WindowWidth,
-            height: Settings.WindowHeight,
+            width: Settings.windowWidth,
+            height: Settings.windowHeight,
             show: visibility,
             title: 'DeezerRPC',
             webPreferences: {
@@ -81,8 +74,8 @@ function createWindow(visibility: boolean, preload?: string) {
     }
 
     return new BrowserWindow({
-        width: Settings.WindowWidth,
-        height: Settings.WindowHeight,
+        width: Settings.windowWidth,
+        height: Settings.windowHeight,
         show: visibility,
         title: 'DeezerRPC'
     });
@@ -91,7 +84,6 @@ function createWindow(visibility: boolean, preload?: string) {
 async function registerShortcutsAndTray(mainWindow: BrowserWindow) {
     const input = new InputManager(mainWindow.webContents);
 
-    // Tray
     const icon = nativeImage.createFromPath(`${__dirname}/assets/icon.png`);
 
     icon.setTemplateImage(true);
@@ -113,17 +105,17 @@ async function registerShortcutsAndTray(mainWindow: BrowserWindow) {
             submenu: [
                 {
                     type: 'normal',
-                    label: '♪ Play/Pause',
+                    label: 'Play/Pause',
                     click: () => input.space()
                 },
                 {
                     type: 'normal',
-                    label: '→ Next',
+                    label: 'Next track',
                     click: () => input.shiftRight()
                 },
                 {
                     type: 'normal',
-                    label: '← Previous',
+                    label: 'Previous track',
                     click: () => input.shiftLeft()
                 }
             ]
@@ -137,7 +129,7 @@ async function registerShortcutsAndTray(mainWindow: BrowserWindow) {
                     type: 'checkbox',
                     label: 'Minimize to tray',
                     checked: getPreference<boolean>('minimizeToTray'),
-                    click: async (item: any) => {
+                    click: async (item) => {
                         setPreference('minimizeToTray', item.checked);
                         await settings.set('minimizeToTray', item.checked);
                     }
@@ -146,7 +138,7 @@ async function registerShortcutsAndTray(mainWindow: BrowserWindow) {
                     type: 'checkbox',
                     label: 'Close to tray',
                     checked: getPreference<boolean>('closeToTray'),
-                    click: async (item: any) => {
+                    click: async (item) => {
                         setPreference('closeToTray', item.checked);
                         await settings.set('closeToTray', item.checked);
                     }
@@ -155,8 +147,8 @@ async function registerShortcutsAndTray(mainWindow: BrowserWindow) {
         },
         {
             type: 'normal',
-            label: `DeezerRPC ${APP_PACKAGE.version}`,
-            click: () => shell.openExternal(APP_PACKAGE.homepage)
+            label: `DeezerRPC ${pkg.version}`,
+            click: () => shell.openExternal(pkg.homepage)
         },
         { type: 'separator' },
         {
@@ -167,14 +159,14 @@ async function registerShortcutsAndTray(mainWindow: BrowserWindow) {
     ]);
 
     tray.setContextMenu(menu);
+    app.dock?.setMenu(menu);
+    thumbarButton(mainWindow, input);
     tray.setToolTip('No music played yet.');
 
-    // Double clicking hide/show
     tray.on('double-click', () => {
         if (mainWindow.isVisible()) mainWindow.hide(); else mainWindow.show();
     });
 
-    // Global Shortcuts
     globalShortcut.register('MediaPlayPause', () => {
         input.space();
     });
@@ -188,17 +180,15 @@ async function registerShortcutsAndTray(mainWindow: BrowserWindow) {
     });
 }
 
-// Preferences
 function getPreference<T>(key: string): T {
-    return APP_PREFERENCES.get(key);
+    return preferences.get(key);
 }
 
 function setPreference(key: string, value: any): any {
-    return APP_PREFERENCES.set(key, value);
+    return preferences.set(key, value);
 }
 
-// IPC
-ipcMain.on('song-changed', (event: any, song: Song) => {
+ipcMain.on('song-changed', (_event, song: Song) => {
     if (!song.artist) song.artist = 'Unknown Artist';
 
     if (!song.name) song.name = 'Unknown Song';
@@ -206,64 +196,66 @@ ipcMain.on('song-changed', (event: any, song: Song) => {
     if (!song.link) song.link = 'https://www.deezer.com';
 
     if (song.listening) {
-        requestPresence(RPC, {
+        client.setActivity({
             details: song.name,
             state: song.artist,
-            assets: {
-                large_image: 'default',
-                large_text: 'DeezerRPC',
-                small_image: 'listening',
-                small_text: 'Listening'
-            },
+            largeImageKey: 'deezer',
+            largeImageText: 'DeezerRPC',
+            smallImageKey: 'listening',
+            smallImageText: 'Listening',
+            endTimestamp: song.time,
             buttons: [
                 {
                     label: 'Play Song',
                     url: song.link
                 }
             ],
-            timestamps: {
-                end: song.time
-            },
             instance: true
-        });
+        }, process.pid);
     } else {
-        requestPresence(RPC, {
+        client.setActivity({
             details: song.name,
             state: song.artist,
-            assets: {
-                large_image: 'default',
-                large_text: 'DeezerRPC',
-                small_image: 'paused',
-                small_text: 'Paused'
-            },
-            buttons: [
-                {
-                    label: 'Play Song',
-                    url: song.link
-                }
-            ],
-            timestamps: {
-                end: song.time
-            },
+            largeImageKey: 'deezer',
+            largeImageText: 'DeezerRPC',
+            smallImageKey: 'paused',
+            smallImageText: 'Paused',
             instance: true
-        });
+        }, process.pid);
     }
 
     tray.setToolTip(`${song.artist} - ${song.name}`);
 });
 
-// App
 app.on('ready', createMainWindow);
 
-// Initialize RPC
-RPC.login({ clientId: Settings.DiscordClientID }).catch((err: any) => {
+client.login({ clientId: Settings.clientId }).catch((err: any) => {
     dialog.showErrorBox('Rich Presence Login Failed', `Please, verify if your discord app is opened/working and relaunch this application. (${err})`);
 });
 
-// Using this to ignore TypeScript error 'RPC.request is not a function'
-function requestPresence(client: any, activity: any) {
-    client.request('SET_ACTIVITY', {
-        pid: process.pid,
-        activity
-    });
+// Electron's types are so bad
+function thumbarButton(w: any, input: any){
+    w.setThumbarButtons([
+        {
+            tooltip: 'Previous track',
+            icon: path.join(__dirname, 'assets', 'previous-track.png'),
+            click () {
+                input.shiftLeft()
+            }
+        },
+        {
+            tooltip: 'Play/Pause',
+            icon: path.join(__dirname, 'assets', 'play-pause.png'),
+            click () {
+                input.space()
+            }
+        },
+        {
+            tooltip: 'Next track',
+            icon: path.join(__dirname, 'assets', 'next-track.png'),
+            click () {
+                input.shiftRight()
+            }
+        }
+    ]);
 }

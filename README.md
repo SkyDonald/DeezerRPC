@@ -4,7 +4,6 @@ Deezer integrated with the Discord Rich Presence.
 ## Instructions
 - Download the [latest release](https://github.com/SkyDonald/DeezerRPC/releases)
 - Run the app and listen what you want!
-- 
 ### If your are on Linux or MacOS download the repo and type `npm run dist-linux` or `npm run dist-mac` then open DeezerRPC/dist and open the main file.
 
 ## Any problem?
