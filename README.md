@@ -22,3 +22,5 @@ You can contact us for support on our [chat server](https://discord.gg/AUfTUJA)
 This project is not supported and created by Deezer.
 
 This application opens the web version of the Deezer application and performs background operations to collect data from the current song. It does not use the Deezer API, everything is collected from the DOM itself.
+
+Forked from https://github.com/Braasileiro/DeezerRPC
